@@ -1,0 +1,22 @@
+[package]
+name = "matrix_multiplication"
+version = "0.1.2"
+authors = ["Oliver Archer <oliver@archer.fi"]
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[[test]]
+name = "tests"
+path = "tests/trybuild.rs"
+
+[dev-dependencies]
+trybuild = { version = "1.0", features = ["diff"] }
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+proc-macro2 = "1.0"
+syn = { version = "1.0.42", features = ["full", "extra-traits"] }
+quote = "1.0"
