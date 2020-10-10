@@ -1,6 +1,6 @@
 [package]
 name = "matrix_multiplication"
-version = "0.1.2"
+version = "0.1.22"
 authors = ["Oliver Archer <oliver@archer.fi"]
 edition = "2018"
 
