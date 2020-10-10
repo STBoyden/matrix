@@ -36,7 +36,7 @@ fn check_array_length(array: &ExprArray) -> Result<(usize, usize)> {
     // Iterates through the passsed in array comparing the current element to the first sub arrays
     // length
     let base_length = (unwrap_array(&array.elems[0])?).elems.len();
-    for i in 1..(&array).elems.len() - 1 {
+    for i in 1..(&array).elems.len() {
         let cur_elem = unwrap_array(&array.elems[i])?;
         if cur_elem.elems.len() != base_length {
             return Err(Error::new(
@@ -88,16 +88,31 @@ fn check_valid_input(array: &ExprArray) -> Result<proc_macro2::TokenStream> {
 pub fn matrix(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as MatrixInput);
     let output_len = input.dimensions.0 * input.dimensions.1;
+    let output_arr = input.parsed_arr;
+
+    let x_dim = input.dimensions.0;
+    let y_dim = input.dimensions.1;
 
     TokenStream::from(quote! {
-        use std::fmt::{ Display, Formatter };
-        struct Matrix(pub [i32; #output_len]);
+        {
+            use std::fmt::{Display, Formatter, Result};
+            #[derive(Debug)]
+            pub struct Matrix([i32; #output_len]);
 
-        impl Display for Matrix {
-            fn fmt(&self, f: &mut Formatter) -> Result {
-                write!(f, "{:?}", self.0)?;
-                Ok(())
+            impl Display for Matrix {
+                fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+                    for i in 0..#x_dim {
+                        if i == 0 { write!(f, "[")? } else { write!(f, " ")? };
+                        for j in 0..#y_dim {
+                            write!(f, "{:>3},", self.0[#y_dim*i+j])?;
+                        }
+                        if i == #x_dim-1 { write!(f, "]")? } else { write!(f, "\n")? };
+                    }
+                    Ok(())
+                }
             }
+
+            Matrix(#output_arr)
         }
     })
 }
