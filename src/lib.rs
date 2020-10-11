@@ -15,13 +15,16 @@ pub fn matrix(input: TokenStream) -> TokenStream {
     let y_dim = input.dimensions.1;
 
     TokenStream::from(quote! {{
-        use std::fmt::{Display, Formatter, Result};
-        #[derive(Debug)]
+        #[derive(Debug, Eq, PartialEq)]
         pub struct Matrix([i32; #output_len]);
 
         // Prints the user inputted array in the same dimensions as the passed in
-        impl Display for Matrix {
-            fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        // Looks like: [ 1,  2,  3,
+        //               4,  5,  6,
+        //               7,  8,  9,]
+
+        impl std::fmt::Display for Matrix {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 for i in 0..#x_dim {
                     if i == 0 { write!(f, "[")? } else { write!(f, " ")? };
                     for j in 0..#y_dim {
@@ -30,6 +33,21 @@ pub fn matrix(input: TokenStream) -> TokenStream {
                     if i == #x_dim-1 { write!(f, "]")? } else { write!(f, "\n")? };
                 }
                 Ok(())
+            }
+        }
+
+        // TODO: Panic message when index out of bounds is badd - plz fix
+        impl<U> std::ops::Index<[U; 2]> for Matrix
+        where
+            U: std::convert::Into<usize> + std::marker::Copy,
+            usize: std::ops::Mul<U, Output = usize> + std::ops::Add<U, Output = usize>,
+        {
+            // TODO: This has to be made more generic if the rest of the macro is made more generic
+            type Output = i32;
+
+            fn index(&self, idx: [U; 2]) -> &Self::Output {
+                let index = #x_dim * idx[1] + idx[0];
+                &self.0[index]
             }
         }
 
