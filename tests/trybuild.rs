@@ -6,4 +6,5 @@ fn tests() {
     t.compile_fail("./tests/diff_len_arrs.rs");
 
     t.pass("./tests/correct_output.rs");
+    t.pass("./tests/index.rs")
 }
