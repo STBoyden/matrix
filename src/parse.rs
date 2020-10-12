@@ -35,7 +35,7 @@ pub(super) fn check_array_length(array: &ExprArray) -> Result<(usize, usize)> {
     // Iterates through the passsed in array comparing the current element to the first sub arrays
     // length
     let base_length = (unwrap_array(&array.elems[0])?).elems.len();
-    for i in 1..(&array).elems.len() {
+    for i in 1..array.elems.len() {
         let cur_elem = unwrap_array(&array.elems[i])?;
         if cur_elem.elems.len() != base_length {
             return Err(Error::new(
