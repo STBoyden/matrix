@@ -1,3 +1,4 @@
+#![allow(clippy::pedantic)]
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::parse_macro_input;
@@ -13,6 +14,11 @@ pub fn matrix(input: TokenStream) -> TokenStream {
 
     let x_dim = input.dimensions.0;
     let y_dim = input.dimensions.1;
+
+    trait Dot<I> {
+        fn dot(self, matrix2: Self) -> Self;
+        fn scalar_dot(self, multipiler: I) -> Self;
+    };
 
     TokenStream::from(quote! {{
         #[derive(Debug, Eq, PartialEq)]
@@ -48,6 +54,18 @@ pub fn matrix(input: TokenStream) -> TokenStream {
             fn index(&self, idx: [U; 2]) -> &Self::Output {
                 let index = #x_dim * idx[1] + idx[0];
                 &self.0[index]
+            }
+        }
+
+        // TODO: Broken - add product matrix type or something. help
+        impl<U: std::ops::Mul<i32, Output = i32>> Dot<U> for Matrix {
+            fn dot(self, matrix2: Self) -> Self {
+                Matrix([1, 2, 3, 4, 5, 6, 7, 8, 9])
+            }
+
+            fn scalar_dot(self, multipiler: U) -> Self {
+                let return_matrix = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                Matrix(return_matrix)
             }
         }
 
